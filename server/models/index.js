@@ -1,4 +1,4 @@
 const User = require('./User');
-const parkingSpace = require('./parkingSpace')
+const ParkingSpace = require('./ParkingSpace')
 
-module.exports = { User, parkingSpace };
+module.exports = { User, ParkingSpace };

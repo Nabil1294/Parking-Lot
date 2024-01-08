@@ -13,7 +13,7 @@ const resolvers = {
       return await ParkingSpace.findOne({ name });
     },
     // Get the logged-in user
-    user: async (parent, args, context) => {
+    me: async (parent, args, context) => {
       if (context.user) {
         return await User.findById(context.user._id);
       }
@@ -88,29 +88,48 @@ const resolvers = {
     },
 
     // Process payment (Stripe integration)
-    processPayment: async (parent, { name, hours, sourceToken }, context) => {
-      if (!context.user) {
-        throw new AuthenticationError('Not logged in');
+processPayment: async (parent, { name, hours, sourceToken }, context) => {
+  if (!context.user) {
+    throw new AuthenticationError('Not logged in');
+  }
+
+  const parkingSpace = await ParkingSpace.findOne({ name });
+  if (!parkingSpace || !parkingSpace.isOccupied) {
+    throw new Error('Parking space not occupied');
+  }
+
+  if (hours <= 0) {
+    throw new Error('Invalid hours');
+  }
+
+  const amount = parkingSpace.hourlyRate * hours * 100; // Amount in cents
+
+  try {
+    // Create Stripe charge
+    const charge = await stripe.charges.create({
+      amount,
+      currency: 'usd',
+      source: sourceToken,
+      description: `Charge for ${hours} hours at ${parkingSpace.name}`,
+    });
+
+    // Update parking space status
+    await ParkingSpace.findOneAndUpdate(
+      { _id: parkingSpace._id },
+      {
+        isOccupied: false,
+        leftAt: new Date()
       }
+    );
 
-      const parkingSpace = await ParkingSpace.findOne({ name });
-      if (!parkingSpace || !parkingSpace.isOccupied) {
-        throw new Error('Parking space not occupied');
-      }
+    return { success: true, chargeId: charge.id };
+  } catch (error) {
+    // Handle Stripe errors or other errors appropriately
+    console.error('Payment processing error:', error);
+    throw new Error('Payment processing failed');
+  }
+},
 
-      const amount = parkingSpace.hourlyRate * hours * 100; // Amount in cents
-
-      // Create Stripe charge
-      const charge = await stripe.charges.create({
-        amount,
-        currency: 'usd',
-        source: sourceToken, // Token from frontend
-        description: `Charge for ${hours} hours at ${parkingSpace.name}`,
-      });
-
-
-      return { success: true, chargeId: charge.id };
-    },
   },
 };
 

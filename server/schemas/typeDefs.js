@@ -30,6 +30,11 @@ const typeDefs = gql`
     parkingSpace(name: String!): ParkingSpace
   }
 
+  type PaymentResult {
+    success: Boolean
+    chargeId: String
+  }
+
   type Mutation {
     login(username: String!, password: String!): Auth
     addUser(username: String!, password: String!): Auth
@@ -37,6 +42,7 @@ const typeDefs = gql`
     updateParkingSpace(name: String!, carOwnerName: String, carMake: String, carModel: String): ParkingSpace
     removeCarFromParkingSpace(name: String!): ParkingSpace
     updateHourlyRate(name: String!, hourlyRate: Float!): ParkingSpace
+    processPayment(name: String!, hours: Int!, sourceToken: String!): PaymentResult
   }
 `;
 

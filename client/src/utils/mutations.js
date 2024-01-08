@@ -53,8 +53,8 @@ export const REMOVE_CAR_FROM_PARKING_SPACE = gql`
 
 
 export const PROCESS_PAYMENT = gql`
-  mutation processPayment($name: String!, $hours: Int!) {
-    processPayment(name: $name, hours: $hours) {
+  mutation processPayment($name: String!, $hours: Int!, $sourceToken: String!) {
+    processPayment(name: $name, hours: $hours, sourceToken: $sourceToken) {
       success
       chargeId
     }
