@@ -6,9 +6,13 @@ const parkingSpaceSchema = new mongoose.Schema({
     unique: true,
     required: true
   },
-  carOwnerName: {
+  customerName: {
     type: String,
-    default: '',
+    default: ''
+  },
+  customerContact: {
+    type: String,
+    default: ''
   },
   carMake: {
     type: String,

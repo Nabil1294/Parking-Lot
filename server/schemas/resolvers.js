@@ -61,12 +61,11 @@ const resolvers = {
       return await ParkingSpace.create({ name });
     },
 
-    // Update a parking space
-    updateParkingSpace: async (parent, { name, carOwnerName, carMake, carModel }) => {
-
+    // Update a parking space with car and customer details
+    updateParkingSpace: async (parent, { name, customerName, customerContact, carMake, carModel }) => {
       return await ParkingSpace.findOneAndUpdate(
         { name },
-        { carOwnerName, carMake, carModel, parkedAt: new Date(), isOccupied: true },
+        { customerName, customerContact, carMake, carModel, parkedAt: new Date(), isOccupied: true },
         { new: true }
       );
     },

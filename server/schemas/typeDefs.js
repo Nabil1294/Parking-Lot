@@ -9,7 +9,8 @@ const typeDefs = gql`
   type ParkingSpace {
     _id: ID
     name: String
-    carOwnerName: String
+    customerName: String
+    customerContact: String
     carMake: String
     carModel: String
     parkedAt: String
