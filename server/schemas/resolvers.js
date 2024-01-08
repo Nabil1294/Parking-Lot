@@ -72,10 +72,17 @@ const resolvers = {
 
     // Remove a car from a parking space
     removeCarFromParkingSpace: async (parent, { name }) => {
-
       return await ParkingSpace.findOneAndUpdate(
         { name },
-        { carOwnerName: '', carMake: '', carModel: '', leftAt: new Date(), isOccupied: false },
+        {
+          customerName: '',
+          customerContact: '',
+          carMake: '',
+          carModel: '',
+          parkedAt: null,
+          leftAt: new Date(),
+          isOccupied: false
+        },
         { new: true }
       );
     },

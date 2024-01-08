@@ -25,11 +25,12 @@ export const ADD_USER = gql`
 `;
 
 export const UPDATE_PARKING_SPACE = gql`
-  mutation updateParkingSpace($name: String!, $carOwnerName: String, $carMake: String, $carModel: String) {
-    updateParkingSpace(name: $name, carOwnerName: $carOwnerName, carMake: $carMake, carModel: $carModel) {
+  mutation updateParkingSpace($name: String!, $customerName: String, $customerContact: String, $carMake: String, $carModel: String) {
+    updateParkingSpace(name: $name, customerName: $customerName, customerContact: $customerContact, carMake: $carMake, carModel: $carModel) {
       _id
       name
-      carOwnerName
+      customerName
+      customerContact
       carMake
       carModel
       isOccupied
@@ -37,15 +38,19 @@ export const UPDATE_PARKING_SPACE = gql`
   }
 `;
 
+
 export const REMOVE_CAR_FROM_PARKING_SPACE = gql`
   mutation removeCarFromParkingSpace($name: String!) {
     removeCarFromParkingSpace(name: $name) {
       _id
       name
+      customerName
+      customerContact
       isOccupied
     }
   }
 `;
+
 
 export const PROCESS_PAYMENT = gql`
   mutation processPayment($name: String!, $hours: Int!) {
