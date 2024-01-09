@@ -34,8 +34,13 @@ const Login = () => {
 
   return (
     <div className="form-container">
+      {error && (
+        <div className="error-message">
+          Login failed
+        </div>
+      )}
       <form onSubmit={handleFormSubmit} className="form-box">
-      <h2 className="form-title">Login </h2>
+        <h2 className="form-title">Login</h2>
         <input
           name="username"
           type="text"
@@ -52,9 +57,10 @@ const Login = () => {
           onChange={handleChange}
           className="form-control"
         />
-        <button type="submit" className="btn btn-primary">Login</button>
+        <button type="submit" className="btn btn-primary">
+          Login
+        </button>
       </form>
-      {error && <div className="error-message">Login failed</div>}
     </div>
   );
 };

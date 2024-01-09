@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [formState, setFormState] = useState({ username: '', password: '' });
-  const [addUser] = useMutation(ADD_USER);
+  const [addUser, { error }] = useMutation(ADD_USER);
   const navigate = useNavigate();
 
   const handleFormSubmit = async (event) => {
@@ -33,6 +33,11 @@ const Signup = () => {
 
   return (
     <div className="form-container">
+      {error && (
+        <div className="error-message">
+          Signup failed
+        </div>
+      )}
       <form onSubmit={handleFormSubmit} className="form-box">
       <h2 className="form-title">Signup </h2>
         <input
