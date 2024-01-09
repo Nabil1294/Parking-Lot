@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
 import Nav from './components/Nav';
-import { StoreProvider, useStoreContext } from './utils/GlobalState';
+import { useStoreContext } from './utils/GlobalState'; // Ensure this import is correct
 import AuthService from './utils/auth';
 import { setCurrentUser, logoutUser } from './utils/actions';
 
@@ -30,28 +30,29 @@ const client = new ApolloClient({
 
 function App() {
   const navigate = useNavigate();
-  const [state, dispatch] = useStoreContext();
+  const [, dispatch] = useStoreContext(); // Only destructuring dispatch as state is not used
 
   useEffect(() => {
     if (AuthService.loggedIn()) {
-      // Update global state with current user
       const user = AuthService.getProfile();
       dispatch(setCurrentUser(user));
     } else {
-      navigate('/');
-      // Dispatch logout action to update global state
+      if (window.location.pathname !== '/') {
+        navigate('/');
+      }
       dispatch(logoutUser());
     }
   }, [navigate, dispatch]);
 
   return (
     <ApolloProvider client={client}>
-      <StoreProvider> 
-        <Nav />
-        <Outlet />
-      </StoreProvider>
+      <Nav />
+      <Outlet />
     </ApolloProvider>
   );
 }
 
 export default App;
+
+
+

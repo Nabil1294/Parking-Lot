@@ -1,20 +1,21 @@
 import { createContext, useContext, useReducer } from "react";
-import { reducer } from './reducers'
+import { reducer } from './reducers'; // Ensure this path is correct
 
 const StoreContext = createContext();
-const { Provider } = StoreContext;
 
-const StoreProvider = ({ value = [], ...props }) => {
+export const StoreProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, {
     parkingSpaces: [],   // Array of parking spaces
     currentUser: null,   // Current logged-in user
   });
 
-  return <Provider value={[state, dispatch]} {...props} />;
+  return (
+    <StoreContext.Provider value={[state, dispatch]}>
+      {children}
+    </StoreContext.Provider>
+  );
 };
 
-const useStoreContext = () => {
+export const useStoreContext = () => {
   return useContext(StoreContext);
 };
-
-export { StoreProvider, useStoreContext };

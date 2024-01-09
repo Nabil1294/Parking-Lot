@@ -2,12 +2,11 @@ import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { StoreProvider } from './utils/GlobalState'; // Ensure this import is correct
 
 import App from './App.jsx';
-import Home from './pages/Home';
-import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard.jsx';
-import Checkout from './pages/Checkout';
+import Login from './components/Login.jsx';
+import Signup from './components/Signup.jsx';
 import NoMatch from './pages/NoMatch';
 
 const router = createBrowserRouter([
@@ -16,27 +15,16 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <NoMatch />,
     children: [
-      {
-        index: true,
-        element: <Home />
-      },
-      {
-        path: '/signup',
-        element: <Signup />
-      },
-      {
-        path: '/dashboard',
-        element: <Dashboard />
-      },
-      {
-        path: '/checkout',
-        element: <Checkout />
-      }
+      { index: true, element: <Login /> },
+      { path: '/signup', element: <Signup /> }
+      // Additional routes can be added here
     ]
   }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <RouterProvider router={router} />
+  <StoreProvider>
+    <RouterProvider router={router} />
+  </StoreProvider>
 );
