@@ -7,7 +7,7 @@ import '../style/Forms.css';
 
 const Login = () => {
   const [formState, setFormState] = useState({ username: '', password: '' });
-  const [login, { error }] = useMutation(LOGIN);
+  const [login, { error, loading }] = useMutation(LOGIN);
   const navigate = useNavigate();
 
   const handleFormSubmit = async (event) => {
@@ -20,7 +20,7 @@ const Login = () => {
       AuthService.login(data.login.token);
       navigate('/dashboard');
     } catch (e) {
-      console.error(e);
+      console.error('Login Error:', e);
     }
   };
 
@@ -34,11 +34,7 @@ const Login = () => {
 
   return (
     <div className="form-container">
-      {error && (
-        <div className="error-message">
-          Login failed
-        </div>
-      )}
+      {error && <div className="error-message">Login failed</div>}
       <form onSubmit={handleFormSubmit} className="form-box">
         <h2 className="form-title">Login</h2>
         <input
@@ -57,13 +53,12 @@ const Login = () => {
           onChange={handleChange}
           className="form-control"
         />
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary" disabled={loading}>
           Login
         </button>
       </form>
     </div>
   );
 };
-
 
 export default Login;

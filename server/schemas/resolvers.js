@@ -4,13 +4,14 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const resolvers = {
   Query: {
-    // Get all parking spaces
-    parkingSpaces: async () => {
-      return await ParkingSpace.find();
+    // Get parking spaces, optionally filtered by user ID
+    parkingSpaces: async (parent, { userId }) => {
+      const query = userId ? { user: userId } : {};
+      return await ParkingSpace.find(query).populate('user');
     },
     // Get a single parking space by name
     parkingSpace: async (parent, { name }) => {
-      return await ParkingSpace.findOne({ name });
+      return await ParkingSpace.findOne({ name }).populate('user');
     },
     // Get the logged-in user
     me: async (parent, args, context) => {
@@ -27,109 +28,98 @@ const resolvers = {
       if (!user) {
         throw new AuthenticationError('Incorrect credentials');
       }
-
       const correctPw = await user.isCorrectPassword(password);
       if (!correctPw) {
         throw new AuthenticationError('Incorrect credentials');
       }
-
       const token = signToken(user);
       return { token, user };
     },
-
     // Add new user
     addUser: async (parent, { username, password }) => {
-      // Check if user already exists
       const existingUser = await User.findOne({ username });
       if (existingUser) {
         throw new Error('User already exists with this username');
       }
-
       const user = await User.create({ username, password });
       const token = signToken(user);
       return { token, user };
     },
-
     // Add a new parking space
-    addParkingSpace: async (parent, { name }) => {
+    addParkingSpace: async (parent, { name, hourlyRate, user: userId }) => {
       // Check if parking space already exists
       const existingSpace = await ParkingSpace.findOne({ name });
       if (existingSpace) {
         throw new Error('Parking space already exists with this name');
       }
-
-      return await ParkingSpace.create({ name });
+    
+      // Check if user exists
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+    
+      return await ParkingSpace.create({ name, hourlyRate, user: userId });
     },
-
+    
     // Update a parking space with car and customer details
-    updateParkingSpace: async (parent, { name, customerName, customerContact, carMake, carModel }) => {
-      return await ParkingSpace.findOneAndUpdate(
-        { name },
-        { customerName, customerContact, carMake, carModel, parkedAt: new Date(), isOccupied: true },
-        { new: true }
-      );
+    updateParkingSpace: async (parent, { id, customerName, customerContact, carMake, carModel, parkedAt }) => {
+      console.log(`Updating parking space: ${id} with data:`, { customerName, customerContact, carMake, carModel, parkedAt });
+    
+      try {
+        const updateData = { customerName, customerContact, carMake, carModel, isOccupied: true };
+        if (parkedAt) {
+          updateData.parkedAt = new Date(parkedAt);
+        }
+    
+        const updatedSpace = await ParkingSpace.findOneAndUpdate(
+          { _id: id }, // Use _id for finding the document
+          updateData,
+          { new: true }
+        );
+    
+        if (!updatedSpace) {
+          console.log(`Parking space not found or update failed for: ${id}`);
+          return null;
+        }
+    
+        console.log(`Parking space updated successfully:`, updatedSpace);
+        return updatedSpace;
+      } catch (error) {
+        console.error(`Error updating parking space: ${id}`, error);
+        throw new Error('Error updating parking space');
+      }
     },
-
     // Remove a car from a parking space
     removeCarFromParkingSpace: async (parent, { name }) => {
       return await ParkingSpace.findOneAndUpdate(
         { name },
-        {
-          customerName: '',
-          customerContact: '',
-          carMake: '',
-          carModel: '',
-          parkedAt: null,
-          leftAt: new Date(),
-          isOccupied: false
-        },
+        { customerName: '', customerContact: '', carMake: '', carModel: '', parkedAt: null, leftAt: new Date(), isOccupied: false },
         { new: true }
       );
     },
-
     // Process payment (Stripe integration)
-processPayment: async (parent, { name, hours, sourceToken }, context) => {
-  if (!context.user) {
-    throw new AuthenticationError('Not logged in');
-  }
-
-  const parkingSpace = await ParkingSpace.findOne({ name });
-  if (!parkingSpace || !parkingSpace.isOccupied) {
-    throw new Error('Parking space not occupied');
-  }
-
-  if (hours <= 0) {
-    throw new Error('Invalid hours');
-  }
-
-  const amount = parkingSpace.hourlyRate * hours * 100; // Amount in cents
-
-  try {
-    // Create Stripe charge
-    const charge = await stripe.charges.create({
-      amount,
-      currency: 'usd',
-      source: sourceToken,
-      description: `Charge for ${hours} hours at ${parkingSpace.name}`,
-    });
-
-    // Update parking space status
-    await ParkingSpace.findOneAndUpdate(
-      { _id: parkingSpace._id },
-      {
-        isOccupied: false,
-        leftAt: new Date()
+    processPayment: async (parent, { name, hours, sourceToken }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError('Not logged in');
       }
-    );
-
-    return { success: true, chargeId: charge.id };
-  } catch (error) {
-    // Handle Stripe errors or other errors appropriately
-    console.error('Payment processing error:', error);
-    throw new Error('Payment processing failed');
-  }
-},
-
+      const parkingSpace = await ParkingSpace.findOne({ name });
+      if (!parkingSpace || !parkingSpace.isOccupied) {
+        throw new Error('Parking space not occupied');
+      }
+      if (hours <= 0) {
+        throw new Error('Invalid hours');
+      }
+      const amount = parkingSpace.hourlyRate * hours * 100; // Amount in cents
+      try {
+        const charge = await stripe.charges.create({ amount, currency: 'usd', source: sourceToken, description: `Charge for ${hours} hours at ${parkingSpace.name}` });
+        await ParkingSpace.findOneAndUpdate({ _id: parkingSpace._id }, { isOccupied: false, leftAt: new Date() });
+        return { success: true, chargeId: charge.id };
+      } catch (error) {
+        console.error('Payment processing error:', error);
+        throw new Error('Payment processing failed');
+      }
+    },
   },
 };
 

@@ -1,3 +1,12 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-image: url('../images/bg.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
 /* :root {
   --primary: #232F3E;
   --secondary: #F3A847;

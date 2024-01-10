@@ -17,6 +17,7 @@ const typeDefs = gql`
     leftAt: String
     isOccupied: Boolean
     hourlyRate: Float
+    user: User
   }
 
   type Auth {
@@ -26,7 +27,7 @@ const typeDefs = gql`
 
   type Query {
     me: User
-    parkingSpaces: [ParkingSpace]
+    parkingSpaces(userId: ID): [ParkingSpace]
     parkingSpace(name: String!): ParkingSpace
   }
 
@@ -38,8 +39,8 @@ const typeDefs = gql`
   type Mutation {
     login(username: String!, password: String!): Auth
     addUser(username: String!, password: String!): Auth
-    addParkingSpace(name: String!): ParkingSpace
-    updateParkingSpace(name: String!, carOwnerName: String, carMake: String, carModel: String): ParkingSpace
+    addParkingSpace(name: String!, user: ID!): ParkingSpace
+    updateParkingSpace(id: ID!, customerName: String, customerContact: String, carMake: String, carModel: String, parkedAt: String): ParkingSpace
     removeCarFromParkingSpace(name: String!): ParkingSpace
     updateHourlyRate(name: String!, hourlyRate: Float!): ParkingSpace
     processPayment(name: String!, hours: Int!, sourceToken: String!): PaymentResult
@@ -47,3 +48,5 @@ const typeDefs = gql`
 `;
 
 module.exports = typeDefs;
+
+

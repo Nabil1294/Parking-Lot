@@ -13,6 +13,10 @@ export const GET_PARKING_SPACES = gql`
       leftAt
       isOccupied
       hourlyRate
+      user {
+        _id
+        username
+      }
     }
   }
 `;
@@ -30,10 +34,13 @@ export const GET_SINGLE_PARKING_SPACE = gql`
       leftAt
       isOccupied
       hourlyRate
+      user {
+        _id
+        username
+      }
     }
   }
 `;
-
 
 export const GET_CURRENT_USER = gql`
   query me {
@@ -43,3 +50,25 @@ export const GET_CURRENT_USER = gql`
     }
   }
 `;
+
+export const GET_USER_PARKING_SPACES = gql`
+  query userParkingSpaces($userId: ID!) {
+    parkingSpaces(userId: $userId) {
+      _id
+      name
+      customerName
+      customerContact
+      carMake
+      carModel
+      parkedAt
+      leftAt
+      isOccupied
+      hourlyRate
+      user {
+        _id
+        username
+      }
+    }
+  }
+`;
+

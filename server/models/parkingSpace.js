@@ -37,6 +37,11 @@ const parkingSpaceSchema = new mongoose.Schema({
   hourlyRate: {
     type: Number,
     default: 10
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   }
 });
 

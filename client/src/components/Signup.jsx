@@ -3,10 +3,11 @@ import { useMutation } from '@apollo/client';
 import { ADD_USER } from '../utils/mutations';
 import AuthService from '../utils/auth';
 import { useNavigate } from 'react-router-dom';
+import '../style/Forms.css';
 
 const Signup = () => {
   const [formState, setFormState] = useState({ username: '', password: '' });
-  const [addUser, { error }] = useMutation(ADD_USER);
+  const [addUser, { error, loading }] = useMutation(ADD_USER);
   const navigate = useNavigate();
 
   const handleFormSubmit = async (event) => {
@@ -19,7 +20,7 @@ const Signup = () => {
       AuthService.login(data.addUser.token);
       navigate('/dashboard');
     } catch (e) {
-      console.error(e);
+      console.error('Signup Error:', e);
     }
   };
 
@@ -33,13 +34,9 @@ const Signup = () => {
 
   return (
     <div className="form-container">
-      {error && (
-        <div className="error-message">
-          Signup failed
-        </div>
-      )}
+      {error && <div className="error-message">Signup failed</div>}
       <form onSubmit={handleFormSubmit} className="form-box">
-      <h2 className="form-title">Signup </h2>
+        <h2 className="form-title">Signup</h2>
         <input
           name="username"
           type="text"
@@ -56,10 +53,13 @@ const Signup = () => {
           onChange={handleChange}
           className="form-control"
         />
-        <button type="submit" className="btn btn-primary">Sign Up</button>
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          Sign Up
+        </button>
       </form>
     </div>
   );
 };
 
 export default Signup;
+

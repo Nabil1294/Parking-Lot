@@ -24,15 +24,30 @@ export const ADD_USER = gql`
   }
 `;
 
+export const ADD_PARKING_SPACE = gql`
+  mutation addParkingSpace($name: String!, $hourlyRate: Float!, $userId: ID!) {
+    addParkingSpace(name: $name, hourlyRate: $hourlyRate, user: $userId) {
+      _id
+      name
+      hourlyRate
+      user {
+        _id
+        username
+      }
+    }
+  }
+`;
+
 export const UPDATE_PARKING_SPACE = gql`
-  mutation updateParkingSpace($name: String!, $customerName: String, $customerContact: String, $carMake: String, $carModel: String) {
-    updateParkingSpace(name: $name, customerName: $customerName, customerContact: $customerContact, carMake: $carMake, carModel: $carModel) {
+  mutation updateParkingSpace($id: ID!, $customerName: String, $customerContact: String, $carMake: String, $carModel: String, $parkedAt: String) {
+    updateParkingSpace(id: $id, customerName: $customerName, customerContact: $customerContact, carMake: $carMake, carModel: $carModel, parkedAt: $parkedAt) {
       _id
       name
       customerName
       customerContact
       carMake
       carModel
+      parkedAt
       isOccupied
     }
   }
@@ -50,7 +65,6 @@ export const REMOVE_CAR_FROM_PARKING_SPACE = gql`
     }
   }
 `;
-
 
 export const PROCESS_PAYMENT = gql`
   mutation processPayment($name: String!, $hours: Int!, $sourceToken: String!) {
