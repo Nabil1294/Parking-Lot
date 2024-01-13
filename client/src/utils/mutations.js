@@ -25,7 +25,7 @@ export const ADD_USER = gql`
 `;
 
 export const ADD_PARKING_SPACE = gql`
-  mutation addParkingSpace($name: String!, $hourlyRate: Float!, $userId: ID!) {
+  mutation addParkingSpace($name: String!, $hourlyRate: Float, $userId: ID!) {
     addParkingSpace(name: $name, hourlyRate: $hourlyRate, user: $userId) {
       _id
       name
@@ -34,9 +34,17 @@ export const ADD_PARKING_SPACE = gql`
         _id
         username
       }
+      customerName
+      customerContact
+      carMake
+      carModel
+      parkedAt
+      leftAt
+      isOccupied
     }
   }
 `;
+
 
 export const UPDATE_PARKING_SPACE = gql`
   mutation updateParkingSpace($id: ID!, $customerName: String, $customerContact: String, $carMake: String, $carModel: String, $parkedAt: String) {

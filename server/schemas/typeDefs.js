@@ -39,7 +39,7 @@ const typeDefs = gql`
   type Mutation {
     login(username: String!, password: String!): Auth
     addUser(username: String!, password: String!): Auth
-    addParkingSpace(name: String!, user: ID!): ParkingSpace
+    addParkingSpace(name: String!, hourlyRate: Float, user: ID!): ParkingSpace
     updateParkingSpace(id: ID!, customerName: String, customerContact: String, carMake: String, carModel: String, parkedAt: String): ParkingSpace
     removeCarFromParkingSpace(name: String!): ParkingSpace
     updateHourlyRate(name: String!, hourlyRate: Float!): ParkingSpace

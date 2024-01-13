@@ -1173,3 +1173,158 @@ const Nav = () => {
 
 export default Nav;
 
+
+
+
+
+
+
+
+
+
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useStoreContext } from '../utils/GlobalState';
+import { logoutUser } from '../utils/actions';
+import AuthService from '../utils/auth';
+import decode from 'jwt-decode';
+import { useMutation } from '@apollo/client';
+import { ADD_PARKING_SPACE } from '../utils/mutations';
+import '../style/Navbar.css';
+
+const Nav = () => {
+  const [state, dispatch] = useStoreContext();
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [parkingSpaceName, setParkingSpaceName] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); // State for error message
+  const [addParkingSpace] = useMutation(ADD_PARKING_SPACE, {
+    refetchQueries: ['GET_USER_PARKING_SPACES'],
+  });
+  const [currentTime, setCurrentTime] = useState(getCurrentDateTime());
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(getCurrentDateTime());
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  function getCurrentDateTime() {
+    return new Date().toLocaleString();
+  }
+
+  const handleLogout = () => {
+    AuthService.logout();
+    dispatch(logoutUser());
+    navigate('/');
+  };
+
+  const handleAddParkingSpaceClick = () => {
+    setShowModal(true);
+    setErrorMessage('');
+  };
+
+  const handleAddParkingSpaceSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    const token = AuthService.getToken();
+    const decoded = token ? decode(token) : null;
+    const userId = decoded?.data?._id;
+
+    if (!userId) {
+      setErrorMessage("Error: User ID is not available.");
+      return;
+    }
+
+    try {
+      await addParkingSpace({
+        variables: {
+          name: parkingSpaceName,
+          hourlyRate: 10.0,
+          userId: userId
+        },
+      });
+      setParkingSpaceName('');
+      setShowModal(false);
+      navigate('/dashboard');
+    } catch (error) {
+      setErrorMessage('Error: A parking space with this name already exists.');
+    }
+  };
+  
+  const renderAuthButtons = () => {
+    if (state.currentUser) {
+      return (
+        <div className="auth-buttons">
+          <Link className="btn btn-outline-light" to="/dashboard">
+            Dashboard
+          </Link>
+          <button className="btn btn-outline-light" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+      );
+    } else {
+      return (
+        <div className="auth-buttons">
+          <Link className="btn btn-outline-light" to="/signup">
+            Signup
+          </Link>
+          <Link className="btn btn-outline-light" to="/">
+            Login
+          </Link>
+        </div>
+      );
+    }
+  };
+
+  const renderAddParkingSpaceButton = () => {
+    if (state.currentUser) {
+      return (
+        <>
+          <button className="btn btn-outline-light add-space-btn" onClick={handleAddParkingSpaceClick}>
+            +
+          </button>
+          {showModal && (
+            <div className="modal">
+              <div className="modal-content">
+                <span className="close" onClick={() => setShowModal(false)}>
+                  &times;
+                </span>
+                <form onSubmit={handleAddParkingSpaceSubmit}>
+                  <label htmlFor="parkingSpaceName">Parking Space Name:</label>
+                  <input
+                    type="text"
+                    id="parkingSpaceName"
+                    value={parkingSpaceName}
+                    onChange={(e) => setParkingSpaceName(e.target.value)}
+                    required
+                  />
+                  <button type="submit">Add Parking Space</button>
+                </form>
+              </div>
+            </div>
+          )}
+        </>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <nav className="navbar custom-nav-bg">
+      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+      {state.currentUser && renderAddParkingSpaceButton()}
+      <div className="nav-center">
+        <h1 className="navbar-brand">Parking Lot Manager</h1>
+        <div className="navbar-text">{currentTime}</div>
+  </div>
+  {renderAuthButtons()}
+</nav>
+  );
+};
+
+export default Nav;

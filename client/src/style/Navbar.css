@@ -79,10 +79,105 @@
   border-color: #f8f9fa;
 }
 
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 30%; /* Control the width of the modal */
+  max-width: 400px; /* Max width for smaller screens */
+}
+
+.close {
+  float: right;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.modal input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.modal button[type="submit"] {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+/* Error Message Styling */
+.alert.alert-danger {
+  text-align: center;
+  margin-left: 15px;
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  width: auto; /* Adjust width as necessary */
+  max-width: 90%; /* Ensure it doesn't touch the screen edges */
+}
+
+
 /* Media query*/
 @media (max-width: 768px) {
   .navbar {
     flex-wrap: wrap;
+  }
+  .modal-content {
+    width: 80%;
+    max-width: none;
+  }
+  .error-container {
+    left: 0;
+    transform: none;
   }
   .nav-center {
     order: 1;

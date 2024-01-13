@@ -46,50 +46,64 @@ const resolvers = {
       return { token, user };
     },
     // Add a new parking space
-    addParkingSpace: async (parent, { name, hourlyRate, user: userId }) => {
-      // Check if parking space already exists
+    addParkingSpace: async (parent, { name, hourlyRate = 10, user: userId }) => {
       const existingSpace = await ParkingSpace.findOne({ name });
       if (existingSpace) {
         throw new Error('Parking space already exists with this name');
       }
     
-      // Check if user exists
-      const user = await User.findById(userId);
-      if (!user) {
-        throw new Error('User not found');
-      }
+      const newSpace = {
+        name,
+        hourlyRate,
+        user: userId,
+        customerName: '',
+        customerContact: '',
+        carMake: '',
+        carModel: '',
+        parkedAt: null,
+        leftAt: null,
+        isOccupied: false
+      };
     
-      return await ParkingSpace.create({ name, hourlyRate, user: userId });
+      return await ParkingSpace.create(newSpace);
     },
+
+    
     
     // Update a parking space with car and customer details
-    updateParkingSpace: async (parent, { id, customerName, customerContact, carMake, carModel, parkedAt }) => {
-      console.log(`Updating parking space: ${id} with data:`, { customerName, customerContact, carMake, carModel, parkedAt });
-    
-      try {
-        const updateData = { customerName, customerContact, carMake, carModel, isOccupied: true };
-        if (parkedAt) {
-          updateData.parkedAt = new Date(parkedAt);
-        }
-    
-        const updatedSpace = await ParkingSpace.findOneAndUpdate(
-          { _id: id }, // Use _id for finding the document
-          updateData,
-          { new: true }
-        );
-    
-        if (!updatedSpace) {
-          console.log(`Parking space not found or update failed for: ${id}`);
-          return null;
-        }
-    
-        console.log(`Parking space updated successfully:`, updatedSpace);
-        return updatedSpace;
-      } catch (error) {
-        console.error(`Error updating parking space: ${id}`, error);
-        throw new Error('Error updating parking space');
-      }
-    },
+updateParkingSpace: async (parent, { id, customerName, customerContact, carMake, carModel, parkedAt }) => {
+  console.log(`Updating parking space: ${id} with data:`, { customerName, customerContact, carMake, carModel, parkedAt });
+
+  try {
+    // Check if at least one of the fields is provided
+    if (!customerName && !customerContact && !carMake && !carModel) {
+      throw new Error('At least one field (customerName, customerContact, carMake, carModel) must be provided');
+    }
+
+    const updateData = { customerName, customerContact, carMake, carModel, isOccupied: true };
+    if (parkedAt) {
+      updateData.parkedAt = new Date(parkedAt);
+    }
+
+    const updatedSpace = await ParkingSpace.findOneAndUpdate(
+      { _id: id }, // Use _id for finding the document
+      updateData,
+      { new: true }
+    );
+
+    if (!updatedSpace) {
+      console.log(`Parking space not found or update failed for: ${id}`);
+      return null;
+    }
+
+    console.log(`Parking space updated successfully:`, updatedSpace);
+    return updatedSpace;
+  } catch (error) {
+    console.error(`Error updating parking space: ${id}`, error);
+    throw new Error('Error updating parking space');
+  }
+},
+
     // Remove a car from a parking space
     removeCarFromParkingSpace: async (parent, { name }) => {
       return await ParkingSpace.findOneAndUpdate(
