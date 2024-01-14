@@ -89,11 +89,16 @@ const Dashboard = () => {
         }
     };
 
-    const handleCheckout = (spaceId) => {
-        const checkoutTime = new Date().toISOString();
-        navigate(`/checkout/${spaceId}`, { state: { checkoutTime } });
-    };
-
+    const handleCheckout = (space) => {
+      console.log("Selected space for checkout:", space);
+      if (!space._id) {
+          console.error("Invalid space ID");
+          return;
+      }
+      navigate(`/checkout/${space._id}`, { state: { space } });
+  };
+  
+  
     const formatDate = (dateString) => {
         const date = isNaN(dateString) ? new Date(dateString) : new Date(parseInt(dateString));
         if (isNaN(date)) {
@@ -162,7 +167,7 @@ const Dashboard = () => {
                           <p className="card-text">Contact: {space.customerContact}</p>
                           <p className="card-text">Vehicle: {space.carMake} {space.carModel}</p>
                           <p className="card-text">Parked At: {formatDate(space.parkedAt)}</p>
-                          <button onClick={() => handleCheckout(space._id)} className="btn btn-danger w-100">Checkout</button>
+                          <button onClick={() => handleCheckout(space)} className="btn btn-danger w-100">Checkout</button>
                         </div>
                       )
                       )}

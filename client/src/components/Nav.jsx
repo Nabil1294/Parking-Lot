@@ -73,12 +73,12 @@ const Nav = () => {
           name: parkingSpaceName,
           hourlyRate: 10.0,
           userId: userId,
-          customerName: '',       // Assigning default empty value
-          customerContact: '',    // Assigning default empty value
-          carMake: '',            // Assigning default empty value
-          carModel: '',           // Assigning default empty value
-          parkedAt: null,         // Assigning default null value
-          leftAt: null,           // Assigning default null value
+          customerName: '',     
+          customerContact: '',   
+          carMake: '',            
+          carModel: '',           
+          parkedAt: null,         
+          leftAt: null,           
           isOccupied: false 
         }
       });
@@ -136,7 +136,7 @@ const Nav = () => {
       return (
         <div className="auth-buttons">
           <Link className="btn btn-outline-light" to="/signup">
-            Signup
+            Sign up
           </Link>
           <Link className="btn btn-outline-light" to="/">
             Login

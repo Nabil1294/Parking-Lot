@@ -36,7 +36,7 @@ const Signup = () => {
     <div className="form-container">
       {error && <div className="error-message">Signup failed</div>}
       <form onSubmit={handleFormSubmit} className="form-box">
-        <h2 className="form-title">Signup</h2>
+        <h2 className="form-title">Sign up</h2>
         <input
           name="username"
           type="text"

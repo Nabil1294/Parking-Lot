@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.15",
-    "@stripe/stripe-js": "^1.54.0",
+    "@stripe/stripe-js": "^1.54.2",
     "@testing-library/react": "^14.0.0",
     "bootstrap": "^5.3.2",
     "date-fns": "^3.2.0",
