@@ -126,15 +126,34 @@ updateParkingSpace: async (parent, { id, customerName, customerContact, carMake,
       }
       const amount = parkingSpace.hourlyRate * hours * 100; // Amount in cents
       try {
-        const charge = await stripe.charges.create({ amount, currency: 'usd', source: sourceToken, description: `Charge for ${hours} hours at ${parkingSpace.name}` });
-        await ParkingSpace.findOneAndUpdate({ _id: parkingSpace._id }, { isOccupied: false, leftAt: new Date() });
-        return { success: true, chargeId: charge.id };
+        const charge = await stripe.charges.create({
+          amount, 
+          currency: 'usd', 
+          source: sourceToken, 
+          description: `Charge for ${hours} hours at ${parkingSpace.name}`
+        });
+
+        await ParkingSpace.findOneAndUpdate(
+          { _id: parkingSpace._id }, 
+          { isOccupied: false, leftAt: new Date() }
+        );
+
+        return {
+          success: charge.status === 'succeeded',
+          chargeId: charge.id,
+          amountCharged: amount / 100, // Converting back to dollars
+          message: 'Payment successful'
+        };
       } catch (error) {
         console.error('Payment processing error:', error);
-        throw new Error('Payment processing failed');
+        return {
+          success: false,
+          message: 'Payment processing failed'
+        };
       }
     },
   },
-};
+  };
+
 
 module.exports = resolvers;

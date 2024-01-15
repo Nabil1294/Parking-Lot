@@ -9,6 +9,7 @@ import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import Checkout from './components/Checkout.jsx';
+import PaymentForm from './components/PaymentForm.jsx';
 import NoMatch from './pages/NoMatch';
 
 const router = createBrowserRouter([
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
       { path: '/signup', element: <Signup /> },
       { path: '/dashboard', element: <Dashboard /> },
       { path: '/checkout/:spaceId', element: <Checkout /> },
+      { path: '/paymentform', element: <PaymentForm /> },
       // Additional routes can be added here
     ]
   }

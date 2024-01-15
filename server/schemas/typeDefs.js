@@ -34,6 +34,8 @@ const typeDefs = gql`
   type PaymentResult {
     success: Boolean
     chargeId: String
+    amountCharged: Float
+    message: String
   }
 
   type Mutation {

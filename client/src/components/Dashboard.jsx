@@ -5,12 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { GET_USER_PARKING_SPACES } from '../utils/queries';
 import { UPDATE_PARKING_SPACE } from '../utils/mutations';
+import { useStoreContext } from '../utils/GlobalState';
+// import { resetRefetch } from '../utils/actions'
 import '../style/Dashboard.css';
 
 const Dashboard = () => {
     const [formData, setFormData] = useState({});
     const [formErrors, setFormErrors] = useState([]);
     const [activeCard, setActiveCard] = useState(null);
+    const [{ shouldRefetch }, dispatch] = useStoreContext();
 
     const navigate = useNavigate();
     const userId = AuthService.getProfile()?.data?._id;
@@ -31,12 +34,17 @@ const Dashboard = () => {
     const [updateParkingSpace] = useMutation(UPDATE_PARKING_SPACE);
 
     useEffect(() => {
-        if (userId) {
-            refetch().then(response => {
-                console.log("Parking spaces data:", response.data);
-            });
-        }
-    }, [userId, refetch]);
+      // This will trigger a refetch when either the userId changes or shouldRefetch is true
+      if (userId || shouldRefetch) {
+          refetch().then(response => {
+              console.log("Parking spaces data:", response.data);
+              if (shouldRefetch) {
+                  // Reset the shouldRefetch flag after refetching
+                  dispatch({ type: 'RESET_REFETCH' });
+              }
+          });
+      }
+  }, [userId, shouldRefetch, dispatch, refetch]);
 
     const handleInputChange = (e, index) => {
         const { name, value } = e.target;
@@ -89,13 +97,17 @@ const Dashboard = () => {
         }
     };
 
+    // const handlePaymentSuccess = () => {
+    //   refetch();
+    // };
+
     const handleCheckout = (space) => {
       console.log("Selected space for checkout:", space);
       if (!space._id) {
           console.error("Invalid space ID");
           return;
       }
-      navigate(`/checkout/${space._id}`, { state: { space } });
+      navigate(`/checkout/${space._id}`, { state: { space} });
   };
   
   
@@ -107,14 +119,9 @@ const Dashboard = () => {
         return format(date, 'MM/dd/yyyy \'at\' h:mm a');
     };
 
-    // const displayError = (message) => {
-    //     return (
-    //         <div className="alert alert-danger" role="alert">
-    //             {message}
-    //         </div>
-    //     );
-    // }
+    
 
+    
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error loading parking spaces.</p>;
 

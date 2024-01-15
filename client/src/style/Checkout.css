@@ -94,7 +94,9 @@
     border-color: #dc3545;
   }
   
-
+  .btn-space-right {
+    margin-right: 10px; /* Adjust as needed */
+  }
 
   * {
     scrollbar-width: thin;
@@ -115,6 +117,20 @@
     border-radius: 20px;
     border: 3px solid #ffffff;
   }
+
+  /* .custom-modal-width {
+    max-width: 100%;
+} */
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 90%; /* Adjust this to control the width */
+  max-width: 90%; /* Adjust to set a maximum width */
+  margin: auto; /* This helps in centering the modal */
+}
   
 
   @media (max-width: 768px) {
