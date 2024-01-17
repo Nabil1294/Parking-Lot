@@ -62,10 +62,10 @@ Mahmoud Abdelgawad (https://github.com/Nabil1294)
 
 
 ### Deployed Page Link:
-
+ https://nabil1294.github.io/Parking-Lot/
 
 ### Heroku Link:
-
+https://secret-reef-99112-46c7ead2da9b.herokuapp.com
 
 
 
